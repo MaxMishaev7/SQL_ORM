@@ -138,12 +138,11 @@ with Session(bind=engine) as session:
   for val in session.query(Sale).all():
     print(val)
 
-  # publisher = input("\nВВЕДИТЕ НАЗВАНИЕ ИЗДАТЕЛЬСТВА: ")
-  publisher = 'АСТ'
-  publ = None
-  for pub in session.query(Publisher).filter(Publisher.name == publisher).all():
-    publ = pub
-    print(pub)
-  
-  print(publ)
+  publ_name = input("\nВВЕДИТЕ НАЗВАНИЕ ИЗДАТЕЛЬСТВА: ")
 
+  # publ_name = 'Манн, Иванов и Фарбер (МИФ)'
+  
+  for pub in session.query(Book.title, Shop.name, Sale.price, Sale.date_sale).join(Publisher).join(Stock).join(Shop).join(Sale).filter(Publisher.name == publ_name).all():   
+    print(pub.title, pub.name, pub.price, pub.date_sale, sep=' | ')
+
+  
