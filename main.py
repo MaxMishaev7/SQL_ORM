@@ -11,7 +11,6 @@ Session = sessionmaker(bind=engine)
 
 def get_shops(session, publisher_nameid):
     result = None
-    # with Session(bind=engine) as session:
     q = session.query(Book.title, Shop.name, Sale.price, Sale.date_sale).select_from(Shop). \
         join(Stock). \
         join(Book). \
@@ -20,9 +19,14 @@ def get_shops(session, publisher_nameid):
 
     if publisher_nameid.isdigit():
         publisher_digit = int(publisher_nameid)
-        print(type(publisher_digit), publisher_digit)
         result = q.filter(Publisher.id == publisher_digit).all()
-        print(result)
+    else:
+        result = q.filter(Publisher.name == publisher_nameid).all()
+    if result != []:
+        for book_title, shop_name, price, date_sale in result:
+            print(f"{book_title:<45} | {shop_name:<15} | {price:<7} | {date_sale.strftime('%d-%m-%Y')}")
+    else:
+        print('В БД нет книг этого издателя')
 
 
 with Session(bind=engine) as session:
@@ -154,5 +158,7 @@ with Session(bind=engine) as session:
     for val in session.query(Sale).all():
         print(val)
 
-    publisher_name = input("Введите: ")
-    get_shops(session, publisher_name)
+    if __name__ == '__main__':
+        publisher_name = input("\nВведите имя издателя или его id: ")
+        print()
+        get_shops(session, publisher_name)
